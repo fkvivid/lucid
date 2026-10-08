@@ -426,6 +426,12 @@ detect_pinned() {
                 [[ -n "$wm" ]] || wm="$cand"
             fi
             [[ -n "$icon" ]] || icon="$cand"
+            # Steam's CEF login loops on Hyprland ≥0.56 as a Wayland client —
+            # prefer Lucid's XWayland wrapper when the Hyprland config has it
+            if [[ "$cand" == steam || "$cand" == com.valvesoftware.Steam ]]; then
+                local steam_wrap="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/scripts/steam.sh"
+                [[ -x "$steam_wrap" ]] && exec="$steam_wrap"
+            fi
             # escape for json
             esc() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
             [[ $found -eq 1 ]] && out+=","
@@ -696,6 +702,8 @@ if [[ $WITH_HYPR -eq 1 ]]; then
         cp "$SRC/support/hypr/modules/"*.lua "$HYPR_DIR/modules/"
         install -m755 "$SRC/support/hypr/scripts/reload.sh" "$HYPR_DIR/scripts/reload.sh"
         install -m755 "$SRC/support/hypr/scripts/cursor-plugin.sh" "$HYPR_DIR/scripts/cursor-plugin.sh"
+        # Steam CEF login/settings loop on Hyprland ≥0.56 — forces XWayland
+        install -m755 "$SRC/support/hypr/scripts/steam.sh" "$HYPR_DIR/scripts/steam.sh"
         # a hyprland.conf left beside hyprland.lua is ambiguous - Hyprland
         # reads one of them and you cannot tell which, so the install looks
         # like it did nothing. the full directory is already backed up above

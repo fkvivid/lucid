@@ -38,7 +38,7 @@
         {
             "appId": "steam",
             "appKey": "steam",
-            "command": "/usr/bin/steam",
+            "command": "~/.config/hypr/scripts/steam.sh",
             "iconName": "steam",
             "name": "Steam"
         },
