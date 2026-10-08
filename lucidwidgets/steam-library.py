@@ -173,8 +173,12 @@ def main():
             game.update(artwork(root, appid))
             games[appid] = game
 
+    lucid_steam = os.path.join(HOME, ".config/hypr/scripts/steam.sh")
     if flatpak:
         launch = ["flatpak", "run", FLATPAK_ID]
+    elif os.access(lucid_steam, os.X_OK):
+        # XWayland wrapper — avoids the Hyprland ≥0.56 CEF login hide loop
+        launch = [lucid_steam]
     elif shutil.which("steam"):
         launch = ["steam"]
     else:

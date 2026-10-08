@@ -2,13 +2,17 @@
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
 
-local suppressMaximizeRule = hl.window_rule({
+-- Ignore maximize requests from apps. Steam is excluded: its CEF login and
+-- settings windows on Hyprland ≥0.56 enter a hide/show loop when maximize is
+-- suppressed (https://github.com/Sn3akyy1/lucid/issues/55,
+-- https://github.com/hyprwm/Hyprland/discussions/15566). RE2 has no
+-- lookbehind, so the match is negated with the negative: prefix.
+hl.window_rule({
     name  = "suppress-maximize-events",
-    match = { class = ".*" },
+    match = { class = "negative:^(steam)$" },
 
     suppress_event = "maximize",
 })
--- suppressMaximizeRule:set_enabled(false)
 
 hl.window_rule({
     name  = "fix-xwayland-drags",
@@ -22,6 +26,20 @@ hl.window_rule({
     },
 
     no_focus = true,
+})
+
+-- Steam CEF dialogs (login QR, settings, friends, …). Keep them floating so
+-- the tiling layout does not fight their XWayland configure dance. The main
+-- library window is titled "Steam" and is left alone.
+hl.window_rule({
+    name  = "float-steam-dialogs",
+    match = {
+        class = "^(steam)$",
+        title = "negative:^(Steam)$",
+    },
+
+    float  = true,
+    center = true,
 })
 
 -- Hyprland-run windowrule
